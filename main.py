@@ -83,10 +83,12 @@ with st.container(border=True):
     )
     vantage = st.selectbox("Advantage/Disadvantage?", AdvantageType, index=1)
 
-    with st.expander("Damage Die"):
+    with st.expander("Damage Die", expanded=True):
         damage_die_count = st.slider("Die Count", min_value=1, max_value=30, value=1)
         damage_die_faces = st.slider("Die Type", min_value=4, max_value=20, value=10)
-        damage_modifiers = st.slider("Damage Modifier", min_value=0, max_value=20, value=0)
+        damage_modifiers = st.slider(
+            "Damage Modifier", min_value=0, max_value=20, value=0
+        )
         damage_dice = DamageDice(damage_die_count, damage_die_faces, damage_modifiers)
     mc = Player(player_ac, prof_bonus)
 
@@ -109,13 +111,16 @@ with st.container(border=True):
     )
 
 
-hit_chances = dict()
-
-for ac in range(10, 26):
-    creature = Creature(ac)
-    hit_chances[ac] = mc.hit_chance(ability_mod, creature, AdvantageType.REGULAR)
-
-
 st.header("Hit chance by AC", divider=True)
 st.write("(without advantage)")
-st.scatter_chart(hit_chances, x_label="Enemy AC", y_label="Hit chance")
+
+hit_chances = []
+for ac in range(10, 26):
+    creature = Creature(ac)
+    item = [mc.hit_chance(ability_mod, creature, vantage) for vantage in AdvantageType]
+    hit_chances.append(item)
+hit_chances_df = pd.DataFrame(
+    hit_chances, columns=["Disadvantage", "Regular", "Advantage"], index=range(10, 26)
+)
+
+st.scatter_chart(hit_chances_df, x_label="Enemy AC", y_label="Hit chance")
