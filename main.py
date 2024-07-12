@@ -83,10 +83,11 @@ with st.container(border=True):
     )
     vantage = st.selectbox("Advantage/Disadvantage?", AdvantageType, index=1)
 
-    damage_die_count = st.slider("Die Count", min_value=1, max_value=30, value=1)
-    damage_die_faces = st.slider("Die Type", min_value=4, max_value=20, value=10)
-    damage_modifiers = st.slider("Damage Modifier", min_value=0, max_value=20, value=0)
-    damage_dice = DamageDice(damage_die_count, damage_die_faces, damage_modifiers)
+    with st.expander("Damage Die"):
+        damage_die_count = st.slider("Die Count", min_value=1, max_value=30, value=1)
+        damage_die_faces = st.slider("Die Type", min_value=4, max_value=20, value=10)
+        damage_modifiers = st.slider("Damage Modifier", min_value=0, max_value=20, value=0)
+        damage_dice = DamageDice(damage_die_count, damage_die_faces, damage_modifiers)
     mc = Player(player_ac, prof_bonus)
 
 
@@ -99,11 +100,13 @@ hit_chance = mc.hit_chance(ability_mod, enemy, vantage)
 expected_dmg = damage_dice.expected_damage()
 expected_dmg_for_attack = hit_chance * expected_dmg
 
-st.write(f"Player has a **{int(hit_chance*100)}%** chance of hitting enemy.")
-st.write(f"Expected dmg for {damage_dice} is **{expected_dmg:.2f}**.")
-st.write(
-    f"Therefore, overall expected damage for attack is **{expected_dmg_for_attack:.2f}**."
-)
+with st.container(border=True):
+    st.header("Results")
+    st.write(f"Player has a **{int(hit_chance*100)}%** chance of hitting")
+    st.write(f"Expected dmg for {damage_dice} is **{expected_dmg:.2f}**")
+    st.write(
+        f"Therefore, overall expected dmg for attack is **{expected_dmg_for_attack:.2f}**"
+    )
 
 
 hit_chances = dict()
